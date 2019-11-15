@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+    <meta charset="utf-8">
+    <title>Slider Test</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="https://fonts.googleapis.com/css?family=Fira+Sans:200,300,300i,400,400i,500,500i,600,600i,700,700i,800,800i|Literata:400,400i,500,500i,600,600i,700,700i|Noto+Sans:400,400i,700,700i&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Source+Serif+Pro&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="main.css">
+  </head>
+
+  <body>
+    <header>
+      <p class="met">THE<br>MET</p>
+      <a href="#landing" class="site-title">Sculptures of Scale</a>
+      <nav class="nav">
+        <a href="#get-started" class="nav-item">Get Started</a>
+        <a href="#explore" class="nav-item">Explore</a>
+        <a href="#learn-more" class="nav-item">Compare</a>
+      </nav>
+    </header>
+    
+    <div id="test"></div>
+    
+    <div class="box">
+      <div class="landing item" id="landing">
+        <div class="landing-text">Sculptures<br> <p class="of">of</p> <p class="landing-text-large"> Scale</p></div>
+        <a href="#get-started"><img src="enter.png" alt="" class="enter-img" width = "100px"></a>
+        <!--<img src="images/landing-images/270532.jpg"></img>-->
+        <div id="landing-images"></div>
+      </div>
+      <div class="get-started-background" id="get-started"></div>
+      <div class="get-started item">
+        <div class="get-started-title"><strong>Get Started:</strong> Let's talk about scale!</div>
+        <img src="get-started.png" alt="" class="get-started-img" width="100%">
+        <a href="#explore"><img src="explore.png" alt="" class="explore-img" width = "100px"></a>
+      </div>
+      <div class="explore item" id="explore">
+        <div class="explore-title"><strong>Explore:</strong> Sculpture Height & Materials</div>
+        <div id="slider-test">
+          <img src="1-icon.png" alt="" class="icon-1" width="55px">
+          <p class="slider-text">Select sculpture<br>height range<br>using sliders</p>
+          <p id="value-range"></p>
+        </div>
+        <div class="spacer">
+          <div class="y-axis-text">Percent of Sculptures in Range</div>
+        </div>
+        <div class="chart-container">
+          <div id="sculpture-range-count"></div>
+          <img src="2-icon.png" alt="" class="icon-2" width="55px">
+          <p class="click-bar-message">Click a bar to view sculptures in your selection!</p>
+          <img src="arrow.png" alt="" class="arrow-img" width = "20px">
+          <div id=bar-chart></div>
+          <p class="x-axis-text">Sculpture Material</p>
+        </div>
+        <div class="spacer"></div>
+        <div class="legend-container">
+          <div class="legend-title"><p class="legend-all-caps">Legend:</p> <p class="legend-lowercase">Sculpture Materials<br> and Counts</p></div>
+          <div id="legendSquares"></div>
+          <div id="legend"></div>
+        </div>
+        <div class="spacer-2"></div>
+        <div id="explore-images-title"></div>
+        <div class="explore-images" id="explore-images"></div>
+        <div class="compare-img-container">
+          <a href="#learn-more"><img src="compare.png" alt="" class="compare-img" width = "100px"></a>
+        </div>
+      </div>
+      <div class="learn-more-background"></div>
+      <div class="learn-more item" id="learn-more">
+        <div class="learn-more-title"><strong>Compare:</strong> Relative Sculpture Height</div>
+        
+        <!--begin qual-->
+<!--    <div class = "descriptionBox">-->
+<!--      <div class = "description">-->
+      
+<!--        <div class= "description1">-->
+<!--          <p class = "titleLarge1">Sculptures<br>of Scale</p>-->
+<!--          <p class = "text">The Metropolitan Museum of Art has made nearly 500,000 pieces of art publicly available through its online collection. Anyone with access to a browser can now view the collection’s images virtually. However, when we view these images in a virtual space, we lose the sense of scale we get when we visit the museum in person. This visualization explores a subset of the Met’s online collection in which scale plays a large role in the viewer expereince : sculptures of human subjects. </p>-->
+<!--        </div>-->
+<!--        <div class = "description2">-->
+<!--          <p class = "title">Get Started</p>-->
+<!--          <p class = "text"> Scultpures of Scale represents a subset of Met’s online collection of sculptures in three categories: large, medium, and small. Click through each category in the <b>Constant Width</b> section to view the sculptures side by side, keeping the width of the images constant. When you’ve selected a sculpture from each category, the <b>Relative Height</b> section below will scale the sculptures, displaying them by their relative heights. Compare the <b>Constant Width</b> and <b>Relative Height</b> sections to explore how scale is represented differently online and in the museum setting. </p>-->
+<!--        </div>-->
+      
+<!--      </div>-->
+      
+      <!--eventually would like to have for input for height of scale bar (user's height)-->
+        <!--<form>-->
+        <!--  <p> Enter your height </p>-->
+        <!--  Feet: <input type="text" id="feet"><br>-->
+        <!--  Inches: <input type="text" id="inches"><br>-->
+        <!--  <input type="submit" value="Enter">-->
+        <!--</form>-->
+      
+<!--    </div>-->
+    
+<!--    <div class="section1">-->
+<!--      <p class = "titleLarge">Constant <br> Width</p>-->
+<!--    </div>-->
+  
+<!--    <div class = "noScale"> -->
+<!--      <div class = "images"> -->
+      
+      
+<!--      <div class = "small">-->
+<!--        <div class="smallLabel" id="overviewLabel">Small Sculptures <br> 10–50cm</div>-->
+<!--        <img src="resized_clipped_tranparent_png/DP256401.png" class = overviewSmallImage height = "350px">-->
+<!--        <button class="next" onclick="changeSmall()">Next small sculpture</button>-->
+<!--      </div>-->
+      
+<!--      <div class="divider1" id="divider"></div>-->
+      
+      
+<!--      <div class ="medium">-->
+<!--        <div class="mediumLabel" id="overviewLabel">Medium Sculptures <br> 50–100cm</div>-->
+<!--        <img src="resized_clipped_tranparent_png/DP250574.png" class = overviewMediumImage height = "350px">-->
+<!--        <button class="next" onclick="changeMedium()">Next medium sculpture</button>-->
+<!--      </div>-->
+      
+<!--      <div class="divider2" id="divider"></div>-->
+      
+      
+<!--      <div class = "large">-->
+<!--        <div class="largeLabel" id="overviewLabel">Large Sculptures <br> 100–200cm</div>-->
+<!--        <img src="resized_clipped_tranparent_png/DP248142.png" class = overviewLargeImage height = "350px">-->
+<!--        <button class="next" onclick="changeLarge()">Next large sculpture</button>-->
+<!--        </div>-->
+        
+        
+        
+<!--      </div>-->
+<!--    </div>-->
+<!--    </div>-->
+    
+<!--    <div class="sculptureLabel">-->
+<!--      <div class= "sculptureDescriptionSmall"></div>-->
+<!--      <div class= "sculptureDescriptionMed"></div>-->
+<!--      <div class= "sculptureDescriptionLarge"></div>-->
+<!--    </div>-->
+    
+<!--    <div class = "scaled">-->
+    
+<!--    <div class="section2">-->
+<!--      <p class = "titleLarge">Relative <br> Height</p>-->
+<!--    </div>-->
+    
+<!--      <div class = "scaleBarContainer">-->
+<!--        <div class = "scaleBar"></div>-->
+<!--        <div class = "scaleLabel">5 ft, 5 in</div>-->
+<!--      </div>-->
+<!--      <div class = "small">-->
+<!--        <img src="resized_clipped_tranparent_png/DP256401.png" class = mainSmallImage>-->
+<!--      </div>-->
+
+<!--      <div class = "medium">-->
+<!--        <img src="resized_clipped_tranparent_png/DP250574.png" class = mainMediumImage>-->
+<!--      </div>-->
+      
+<!--      <div class = "large">-->
+<!--        <img src="resized_clipped_tranparent_png/DP248142.png" class = mainLargeImage>-->
+<!--    </div>-->
+<!--end qual-->
+        
+        
+        
+      </div>
+      <footer class="footer item">
+        <p class = "title" style = "text-align: center">Created by Marisa Ruiz Asari</p>
+        <p class = "text" style = "text-align: center">Parsons Masters in Data Visualization | Major Studio 1</p>
+        <div style = "text-align: center">
+          <a class = "text" href = "https://github.com/marisaruizasari/Met_sculptures_qual">View Documentation on GitHub</a>
+        </div>
+      </footer>
+      
+    </div>
+  
+    <script src="https://d3js.org/d3.v5.min.js"></script>
+    <script src="https://unpkg.com/d3-simple-slider"></script>
+    <!--<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.js"></script>-->
+    <!--<script src='okzoom/src/okzoom.js'></script>-->
+    <!--<script src='okzoom/src/okzoom.min.js'></script>-->
+    <script src="main.js"></script>
+  </body>
+</html>
