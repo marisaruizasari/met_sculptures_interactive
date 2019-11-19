@@ -97,57 +97,49 @@ var barChart = svg.append("g").selectAll("rect")
 
 // on bar click functions ------------------------------------------->
 
-var exploreImages = d3.select('.explore-images')
-  .append("svg")
-  .attr("height", 200)
-  .attr("width", 30);
-
 // image display function    https://stackoverflow.com/questions/41087774/display-images-array-onclick-button
-function displayImage (src, width, alt) {
+function displayImage (src, width, alt, className, parentElement, parentClassName) {
+
+
 			var img = document.createElement("img");
 			img.src = src;
 			img.width = width;
 			img.alt = alt;
-			img.className = "displayed-images"
+			img.className = className
 
-			document.getElementById("explore-images").appendChild(img);
+			if (parentClassName) {
+			  var imgDiv = document.createElement("div");
+			  imgDiv.className = parentClassName
+
+			  imgDiv.appendChild(img)
+
+        var removeIcon = document.createElement("img")
+        removeIcon.className = "remove-icon"
+        removeIcon.src = "remove.png"
+
+        imgDiv.appendChild(removeIcon)
+
+			  document.querySelector(parentElement).appendChild(imgDiv);
+
+			} else {
+			  document.querySelector(parentElement).appendChild(img);
+			}
+
+
 		}
 
 // render each image function
-function renderEachImage(array) {
+function renderEachImage(array, className, parentElement, parentClassName) {
 
 			for(var i = 0; i < array.length; i++){
-				displayImage(`resized_clipped_tranparent_png/${array[i].fileName.split('.')[0]}.png`, "50px", i)
-				// .  /met_sculptures2
+				displayImage(`resized_clipped_tranparent_png/${array[i].fileName.split('.')[0]}.png`, "50px", i, className, parentElement, parentClassName)
 			}
 
 }
 
 
 
-// //not working
-// function createImagesD3 (array) {
-//   console.log(array);
 
-//   var imagesForExplore = exploreImages.selectAll("image")
-//     .remove()
-//     .exit();
-
-
-//     imagesForExplore
-//     .data(array)
-//     .enter()
-//     .append("svg:image")
-//     .attr("src", function (d,i) {
-//       console.log(d);
-//       var source = `../met_sculptures2/resized_clipped_tranparent_png/${d.fileName.split('.')[0]}.png`;
-//       return source;
-//     })
-//     .attr("width", "50px")
-//     .attr("height", "50px")
-//     .attr("class", "displayed-images");
-
-// }
 
 // function to remove images before rendering new ones  https://www.abeautifulsite.net/adding-and-removing-elements-on-the-fly-using-javascript
 
@@ -169,6 +161,7 @@ function removeElementsByClass(query) {
 
 var colors = ["#FFDC47","#755A52","#E8DED3","#C7AFA5","#C77564","#F9EED7","#C2894B","#D3DADA","#DFDEDA","#FFEAE4","#DDDEC7"];
 var materialNames = ["gold", "wood", "marble", "stone", "terracotta", "ivory", "bronze", "silver", "ceramic", "alabaster", "plaster"];
+var materialNamesCap = ["Gold", "Wood", "Marble", "Stone", "Terracotta", "Ivory", "Bronze", "Silver", "Ceramic", "Alabaster", "Plaster"];
 
 
 var legendSquares = d3.select('div#legendSquares')
@@ -346,6 +339,9 @@ slider2.on('onchange', vals => {
   var alabaster = [];
   var plaster = [];
 
+  var materialArrays = [gold, wood, marble, stone, terracotta, ivory, bronze, silver, ceramic, alabaster, plaster]
+
+
   sculpturesInSliderRange.forEach(rangedSculpture => {
 
     mediumArray(rangedSculpture, gold, "gold", "Gold");
@@ -435,6 +431,9 @@ slider2.on('onchange', vals => {
   var barPadding = 16;
   var barWidth = (svgWidth/materials.length);
 
+
+
+
   var bars = svg.select("g").selectAll("rect")
     .remove()
     .exit()
@@ -482,6 +481,28 @@ slider2.on('onchange', vals => {
 
   }
 
+  //function to render comparison images
+
+  function renderCompareImage(src, height, alt, className, parentQuery) {
+
+          var imgDiv = document.createElement("div")
+          imgDiv.className = className
+
+          var img = document.createElement("img");
+    			img.src = src;
+    			img.style.height = height*5 + "px";
+    			img.alt = alt;
+
+    			imgDiv.appendChild(img)
+
+    			var parent = document.querySelector(parentQuery)
+    			parent.appendChild(imgDiv)
+        }
+
+  //array for comparison selected images
+  var arrayForCompare = [];
+
+
   svg.select("g").selectAll("rect")
   .on("click", function (d,i) {
     console.log(d);
@@ -491,275 +512,490 @@ slider2.on('onchange', vals => {
     //for scroll into view
     const element = document.getElementById('legend');
 
-    if (d.material == "Gold") {
-      // window.location = '#legend';
-      element.scrollIntoView({behavior: "smooth"});
 
-      exploreImagesTitle.html(`<p class="explore-images-title-p">Gold sculptures from your selection</p>`).style("background", colors[0]).style("color", "peru")
-      if (barClicked != 0 && clicked == true) {
-        removeElementsByClass(".displayed-images")
-      }
+    // render images for each material
+    for (var x=0; x<materialNames.length; x++) {
+      if (d.material == materialNamesCap[x]) {
+        element.scrollIntoView({behavior: "smooth"});
 
-      var currentImages = [];
-      for (var i=0; i<gold.length; i++) {
+      exploreImagesTitle.html(`<p class="explore-images-title-p">${materialNamesCap[x]} sculptures from your selection</p>`).style("background", colors[x]).style("color", "black")
+
+      removeElementsByClass(".displayed-images")
+
+       var currentImages = [];
+      for (var i=0; i<materialArrays[x].length; i++) {
         imageArray.forEach(image => {
-          if (gold[i]["Object ID"].match(image["Object ID"])) {
+          if (materialArrays[x][i]["Object ID"].match(image["Object ID"])) {
             currentImages.push(image)
           }
         });
       }
 
       currentImages.sort(compare)
-      renderEachImage(currentImages)
+      renderEachImage(currentImages, "displayed-images", "#explore-images")
       console.log(currentImages)
 
-      barClicked = 0;
+      var eachExampleImage = document.querySelectorAll(".displayed-images")
+
+      eachExampleImage.forEach(img => {
+        img.addEventListener("mouseover", function(){
+
+          var targetElement = this.parentNode.parentNode
+
+          console.log(this)
+
+          // console.log(targetElement)
+
+          var tooltip = document.createElement("div")
+
+          var currentImageInfo;
+
+          currentImages.forEach(image => {
+            if (image.fileName.match(this.src.split("_png/")[1].split(".png")[0])) {
+              currentImageInfo = image;
+              return currentImageInfo;
+            }
+          })
+
+          var genderTag;
+
+          if (currentImageInfo.gender == "m") {
+            genderTag = "Male"
+          } else if (currentImageInfo.gender == "w") {
+            genderTag = "Female"
+          }
+
+          tooltip.className = "tooltip-test";
+          tooltip.innerHTML = `${currentImageInfo["Object Name"]}<br>${currentImageInfo.Culture} | Year ${currentImageInfo["Object End Date"]}<br>${currentImageInfo.height} centimeters<br>Gender: ${genderTag}<br><p class="tooltip-title">Click Sculpture to Add to Selection</p>`;
+          // <a href=${currentImageInfo["Link Resource"]}>View on Met Website</a>
+          tooltip.style.left = event.clientX - 80 + "px";
+          tooltip.style.top = event.clientY + 30 + "px";
+          tooltip.style.position = "fixed";
+
+          targetElement.appendChild(tooltip)
+
+        })
+      });
+
+      eachExampleImage.forEach(img => {
+        img.addEventListener("mouseout", function(){
+
+          var targetElement = this.parentNode.parentNode
+          var tooltip = document.querySelector(".tooltip-test")
+          targetElement.removeChild(tooltip)
+
+        })
+      });
+
+      eachExampleImage.forEach(img => {
+        img.addEventListener("click", function(){
+
+        console.log(this.src.split("_png/")[1].split(".png")[0])
+
+
+        if (arrayForCompare.length <= 2) {
+
+          currentImages.forEach(imgObject => {
+
+          if (imgObject.fileName.match(this.src.split("_png/")[1].split(".png")[0])) {
+            console.log("matched")
+            arrayForCompare.push(imgObject)
+          } else {
+            console.log("not-matched")
+          }
+        })
+
+        removeElementsByClass(".compare-message-p")
+        removeElementsByClass(".selected-sculpture-parent-div")
+        renderEachImage(arrayForCompare, "selected-sculpture", ".sidebar-contents", "selected-sculpture-parent-div")
+
+        removeElementsByClass(".compare-height-images")
+        for(var i = 0; i<arrayForCompare.length; i++) {
+          console.log("comparison obejct: " + parseInt(arrayForCompare[i].height))
+          renderCompareImage(`resized_clipped_tranparent_png/${arrayForCompare[i].fileName.split('.')[0]}.png`, parseInt(arrayForCompare[i].height), [i], "compare-height-images", ".compare-image-container")
+        }
+
+        //add "change selection" button to compare section
+        removeElementsByClass(".change-selection-a")
+
+        var changeSelectionButton = document.createElement("a")
+        changeSelectionButton.className = "change-selection-a"
+        changeSelectionButton.href = "#legend"
+        changeSelectionButton.innerHTML = "Change sculpture selection"
+
+
+        var changeSelectionDiv = document.querySelector(".change-selection")
+
+        changeSelectionDiv.appendChild(changeSelectionButton)
+
+
+         var removalIcons = document.querySelectorAll(".remove-icon")
+
+        removalIcons.forEach(icon => {
+        icon.addEventListener("click", function () {
+          // console.log(this)
+          var index = this.parentNode.querySelector("img").alt
+          console.log("index: " + index)
+
+          this.parentNode.remove();
+
+          arrayForCompare.splice(index, 1)
+
+          if (arrayForCompare.length <3) {
+          removeElementsByClass(".compare-selection-anchor")
+        }
+
+
+          })
+       });
+
+
+        } else {
+
+          console.log("your selection is full, please remove a sculpture before adding to your selection")
+        }
+
+        console.log(arrayForCompare)
+
+        if (arrayForCompare.length >= 3) {
+
+          removeElementsByClass(".compare-selection-anchor")
+
+          var compareAnchorDiv = document.querySelector(".compare-anchor-div")
+
+          var compareAnchor = document.createElement("a")
+          compareAnchor.href = "#learn-more"
+          compareAnchor.className = "compare-selection-anchor"
+
+          var compareImage = document.createElement("img")
+
+          compareImage.src = "compare.png"
+          compareImage.className = "compare-img"
+
+          compareAnchor.appendChild(compareImage)
+
+          compareAnchorDiv.appendChild(compareAnchor)
+
+        }
+
+
+
+        })
+      })
+
+
+
+      barClicked = x;
       clicked = true;
-    } else if (d.material == "Wood") {
 
-      element.scrollIntoView({behavior: "smooth"});
-
-      exploreImagesTitle.html(`<p class="explore-images-title-p">Wood sculptures from your selection</p>`).style("background", colors[1]).style("color", "white")
-      if (barClicked != 1 && clicked == true) {
-        removeElementsByClass(".displayed-images")
       }
-
-      var currentImages = [];
-      for (var i=0; i<wood.length; i++) {
-        imageArray.forEach(image => {
-          if (wood[i]["Object ID"].match(image["Object ID"])) {
-            currentImages.push(image)
-            // createImagesD3(currentImages)
-          }
-        });
-      }
-
-      currentImages.sort(compare)
-      renderEachImage(currentImages)
-      console.log(currentImages)
-
-      barClicked = 1;
-      clicked = true;
-    } else if (d.material == "Marble") {
-
-      element.scrollIntoView({behavior: "smooth"});
-
-      exploreImagesTitle.html(`<p class="explore-images-title-p">Marble sculptures from your selection</p>`).style("background", colors[2]).style("color", "peru")
-      if (barClicked != 2 && clicked == true) {
-        removeElementsByClass(".displayed-images")
-      }
-
-      var currentImages = [];
-      for (var i=0; i<marble.length; i++) {
-        imageArray.forEach(image => {
-          if (marble[i]["Object ID"].match(image["Object ID"])) {
-            currentImages.push(image)
-            // createImagesD3(currentImages)
-          }
-        });
-      }
-
-      currentImages.sort(compare)
-      renderEachImage(currentImages)
-      console.log(currentImages)
-
-      barClicked = 2;
-      clicked = true;
-    } else if (d.material == "Stone") {
-
-      element.scrollIntoView({behavior: "smooth"});
-
-      exploreImagesTitle.html(`<p class="explore-images-title-p">Stone sculptures from your selection</p>`).style("background", colors[3]).style("color", "white")
-      if (barClicked != 3 && clicked == true) {
-        removeElementsByClass(".displayed-images")
-      }
-
-      var currentImages = [];
-      for (var i=0; i<stone.length; i++) {
-        imageArray.forEach(image => {
-          if (stone[i]["Object ID"].match(image["Object ID"])) {
-            currentImages.push(image)
-            // createImagesD3(currentImages)
-          }
-        });
-      }
-
-      currentImages.sort(compare)
-      renderEachImage(currentImages)
-      console.log(currentImages)
-
-      barClicked = 3;
-      clicked = true;
-    } else if (d.material == "Terracotta") {
-
-      element.scrollIntoView({behavior: "smooth"});
-
-      exploreImagesTitle.html(`<p class="explore-images-title-p">Terracotta sculptures from your selection</p>`).style("background", colors[4]).style("color", "white")
-      if (barClicked != 4 && clicked == true) {
-        removeElementsByClass(".displayed-images")
-      }
-
-      var currentImages = [];
-      for (var i=0; i<terracotta.length; i++) {
-        imageArray.forEach(image => {
-          if (terracotta[i]["Object ID"].match(image["Object ID"])) {
-            currentImages.push(image)
-          }
-        });
-      }
-
-      currentImages.sort(compare)
-      renderEachImage(currentImages)
-      console.log(currentImages)
-
-      barClicked = 4;
-      clicked = true;
-    } else if (d.material == "Ivory") {
-
-      element.scrollIntoView({behavior: "smooth"});
-
-      exploreImagesTitle.html(`<p class="explore-images-title-p">Ivory sculptures from your selection</p>`).style("background", colors[5]).style("color", "peru")
-      if (barClicked != 5 && clicked == true) {
-        removeElementsByClass(".displayed-images")
-      }
-
-      var currentImages = [];
-      for (var i=0; i<ivory.length; i++) {
-        imageArray.forEach(image => {
-          if (ivory[i]["Object ID"].match(image["Object ID"])) {
-            currentImages.push(image)
-          }
-        });
-      }
-
-      currentImages.sort(compare)
-      renderEachImage(currentImages)
-      console.log(currentImages)
-
-      barClicked = 5;
-      clicked = true;
-    } else if (d.material == "Bronze") {
-
-      element.scrollIntoView({behavior: "smooth"});
-
-      exploreImagesTitle.html(`<p class="explore-images-title-p">Bronze sculptures from your selection</p>`).style("background", colors[6]).style("color", "white")
-      if (barClicked != 6 && clicked == true) {
-        removeElementsByClass(".displayed-images")
-      }
-
-      var currentImages = [];
-      for (var i=0; i<bronze.length; i++) {
-        imageArray.forEach(image => {
-          if (bronze[i]["Object ID"].match(image["Object ID"])) {
-            currentImages.push(image)
-          }
-        });
-      }
-
-      currentImages.sort(compare)
-      renderEachImage(currentImages)
-      console.log(currentImages)
-
-      barClicked = 6;
-      clicked = true;
-    } else if (d.material == "Silver") {
-
-      element.scrollIntoView({behavior: "smooth"});
-
-      exploreImagesTitle.html(`<p class="explore-images-title-p">Silver sculptures from your selection</p>`).style("background", colors[7]).style("color", "peru")
-      if (barClicked != 7 && clicked == true) {
-        removeElementsByClass(".displayed-images")
-      }
-
-      var currentImages = [];
-      for (var i=0; i<silver.length; i++) {
-        imageArray.forEach(image => {
-          if (silver[i]["Object ID"].match(image["Object ID"])) {
-            currentImages.push(image)
-          }
-        });
-      }
-
-      currentImages.sort(compare)
-      renderEachImage(currentImages)
-      console.log(currentImages)
-
-      barClicked = 7;
-      clicked = true;
-    } else if (d.material == "Ceramic") {
-
-      element.scrollIntoView({behavior: "smooth"});
-
-      exploreImagesTitle.html(`<p class="explore-images-title-p">Ceramic sculptures from your selection</p>`).style("background", colors[8]).style("color", "peru")
-      if (barClicked != 8 && clicked == true) {
-        removeElementsByClass(".displayed-images")
-      }
-
-      var currentImages = [];
-      for (var i=0; i<ceramic.length; i++) {
-        imageArray.forEach(image => {
-          if (ceramic[i]["Object ID"].match(image["Object ID"])) {
-            currentImages.push(image)
-          }
-        });
-      }
-
-      currentImages.sort(compare)
-      renderEachImage(currentImages)
-      console.log(currentImages)
-
-      barClicked = 8;
-      clicked = true;
-    } else if (d.material == "Alabaster") {
-
-      element.scrollIntoView({behavior: "smooth"});
-
-      exploreImagesTitle.html(`<p class="explore-images-title-p">Alabaster sculptures from your selection</p>`).style("background", colors[9]).style("color", "peru")
-      if (barClicked != 9 && clicked == true) {
-        removeElementsByClass(".displayed-images")
-      }
-
-      var currentImages = [];
-      for (var i=0; i<alabaster.length; i++) {
-        imageArray.forEach(image => {
-          if (alabaster[i]["Object ID"].match(image["Object ID"])) {
-            currentImages.push(image)
-          }
-        });
-      }
-
-      currentImages.sort(compare)
-      renderEachImage(currentImages)
-      console.log(currentImages)
-
-      barClicked = 9;
-      clicked = true;
-    } else if (d.material == "Plaster") {
-
-      element.scrollIntoView({behavior: "smooth"});
-
-      exploreImagesTitle.html(`<p class="explore-images-title-p">Plaster sculptures from your selection</p>`).style("background", colors[10]).style("color", "peru")
-      if (barClicked != 10 && clicked == true) {
-        removeElementsByClass(".displayed-images")
-      }
-
-      var currentImages = [];
-      for (var i=0; i<plaster.length; i++) {
-        imageArray.forEach(image => {
-          if (plaster[i]["Object ID"].match(image["Object ID"])) {
-            currentImages.push(image)
-          }
-        });
-      }
-
-      currentImages.sort(compare)
-      renderEachImage(currentImages)
-      console.log(currentImages)
-
-      barClicked = 10;
-      clicked=true;
     }
 
+
+
+    // if (d.material == "Gold") {
+    //   // window.location = '#legend';
+    //   element.scrollIntoView({behavior: "smooth"});
+
+    //   exploreImagesTitle.html(`<p class="explore-images-title-p">Gold sculptures from your selection</p>`).style("background", colors[0]).style("color", "peru")
+    //   if (barClicked != 0 && clicked == true) {
+    //     removeElementsByClass(".displayed-images")
+    //   }
+
+    //   var currentImages = [];
+    //   for (var i=0; i<gold.length; i++) {
+    //     imageArray.forEach(image => {
+    //       if (gold[i]["Object ID"].match(image["Object ID"])) {
+    //         currentImages.push(image)
+    //       }
+    //     });
+    //   }
+
+    //   currentImages.sort(compare)
+    //   renderEachImage(currentImages)
+    //   console.log(currentImages)
+
+    //   var eachExampleImage = document.querySelectorAll(".displayed-images")
+
+
+    //   eachExampleImage.forEach(img => {
+    //     img.addEventListener("click", testFunction(currentImages))
+    //   })
+
+    //   barClicked = 0;
+    //   clicked = true;
+    // } else if (d.material == "Wood") {
+
+    //   element.scrollIntoView({behavior: "smooth"});
+
+    //   exploreImagesTitle.html(`<p class="explore-images-title-p">Wood sculptures from your selection</p>`).style("background", colors[1]).style("color", "white")
+    //   if (barClicked != 1 && clicked == true) {
+    //     removeElementsByClass(".displayed-images")
+    //   }
+
+    //   var currentImages = [];
+    //   for (var i=0; i<wood.length; i++) {
+    //     imageArray.forEach(image => {
+    //       if (wood[i]["Object ID"].match(image["Object ID"])) {
+    //         currentImages.push(image)
+    //         // createImagesD3(currentImages)
+    //       }
+    //     });
+    //   }
+
+    //   currentImages.sort(compare)
+    //   renderEachImage(currentImages)
+    //   console.log(currentImages)
+
+    //   barClicked = 1;
+    //   clicked = true;
+    // } else if (d.material == "Marble") {
+
+    //   element.scrollIntoView({behavior: "smooth"});
+
+    //   exploreImagesTitle.html(`<p class="explore-images-title-p">Marble sculptures from your selection</p>`).style("background", colors[2]).style("color", "peru")
+    //   if (barClicked != 2 && clicked == true) {
+    //     removeElementsByClass(".displayed-images")
+    //   }
+
+    //   var currentImages = [];
+    //   for (var i=0; i<marble.length; i++) {
+    //     imageArray.forEach(image => {
+    //       if (marble[i]["Object ID"].match(image["Object ID"])) {
+    //         currentImages.push(image)
+    //         // createImagesD3(currentImages)
+    //       }
+    //     });
+    //   }
+
+    //   currentImages.sort(compare)
+    //   renderEachImage(currentImages)
+    //   console.log(currentImages)
+
+    //   barClicked = 2;
+    //   clicked = true;
+    // } else if (d.material == "Stone") {
+
+    //   element.scrollIntoView({behavior: "smooth"});
+
+    //   exploreImagesTitle.html(`<p class="explore-images-title-p">Stone sculptures from your selection</p>`).style("background", colors[3]).style("color", "white")
+    //   if (barClicked != 3 && clicked == true) {
+    //     removeElementsByClass(".displayed-images")
+    //   }
+
+    //   var currentImages = [];
+    //   for (var i=0; i<stone.length; i++) {
+    //     imageArray.forEach(image => {
+    //       if (stone[i]["Object ID"].match(image["Object ID"])) {
+    //         currentImages.push(image)
+    //         // createImagesD3(currentImages)
+    //       }
+    //     });
+    //   }
+
+    //   currentImages.sort(compare)
+    //   renderEachImage(currentImages)
+    //   console.log(currentImages)
+
+    //   barClicked = 3;
+    //   clicked = true;
+    // } else if (d.material == "Terracotta") {
+
+    //   element.scrollIntoView({behavior: "smooth"});
+
+    //   exploreImagesTitle.html(`<p class="explore-images-title-p">Terracotta sculptures from your selection</p>`).style("background", colors[4]).style("color", "white")
+    //   if (barClicked != 4 && clicked == true) {
+    //     removeElementsByClass(".displayed-images")
+    //   }
+
+    //   var currentImages = [];
+    //   for (var i=0; i<terracotta.length; i++) {
+    //     imageArray.forEach(image => {
+    //       if (terracotta[i]["Object ID"].match(image["Object ID"])) {
+    //         currentImages.push(image)
+    //       }
+    //     });
+    //   }
+
+    //   currentImages.sort(compare)
+    //   renderEachImage(currentImages)
+    //   console.log(currentImages)
+
+    //   barClicked = 4;
+    //   clicked = true;
+    // } else if (d.material == "Ivory") {
+
+    //   element.scrollIntoView({behavior: "smooth"});
+
+    //   exploreImagesTitle.html(`<p class="explore-images-title-p">Ivory sculptures from your selection</p>`).style("background", colors[5]).style("color", "peru")
+    //   if (barClicked != 5 && clicked == true) {
+    //     removeElementsByClass(".displayed-images")
+    //   }
+
+    //   var currentImages = [];
+    //   for (var i=0; i<ivory.length; i++) {
+    //     imageArray.forEach(image => {
+    //       if (ivory[i]["Object ID"].match(image["Object ID"])) {
+    //         currentImages.push(image)
+    //       }
+    //     });
+    //   }
+
+    //   currentImages.sort(compare)
+    //   renderEachImage(currentImages)
+    //   console.log(currentImages)
+
+    //   barClicked = 5;
+    //   clicked = true;
+    // } else if (d.material == "Bronze") {
+
+    //   element.scrollIntoView({behavior: "smooth"});
+
+    //   exploreImagesTitle.html(`<p class="explore-images-title-p">Bronze sculptures from your selection</p>`).style("background", colors[6]).style("color", "white")
+    //   if (barClicked != 6 && clicked == true) {
+    //     removeElementsByClass(".displayed-images")
+    //   }
+
+    //   var currentImages = [];
+    //   for (var i=0; i<bronze.length; i++) {
+    //     imageArray.forEach(image => {
+    //       if (bronze[i]["Object ID"].match(image["Object ID"])) {
+    //         currentImages.push(image)
+    //       }
+    //     });
+    //   }
+
+    //   currentImages.sort(compare)
+    //   renderEachImage(currentImages)
+    //   console.log(currentImages)
+
+    //   barClicked = 6;
+    //   clicked = true;
+    // } else if (d.material == "Silver") {
+
+    //   element.scrollIntoView({behavior: "smooth"});
+
+    //   exploreImagesTitle.html(`<p class="explore-images-title-p">Silver sculptures from your selection</p>`).style("background", colors[7]).style("color", "peru")
+    //   if (barClicked != 7 && clicked == true) {
+    //     removeElementsByClass(".displayed-images")
+    //   }
+
+    //   var currentImages = [];
+    //   for (var i=0; i<silver.length; i++) {
+    //     imageArray.forEach(image => {
+    //       if (silver[i]["Object ID"].match(image["Object ID"])) {
+    //         currentImages.push(image)
+    //       }
+    //     });
+    //   }
+
+    //   currentImages.sort(compare)
+    //   renderEachImage(currentImages)
+    //   console.log(currentImages)
+
+    //   barClicked = 7;
+    //   clicked = true;
+    // } else if (d.material == "Ceramic") {
+
+    //   element.scrollIntoView({behavior: "smooth"});
+
+    //   exploreImagesTitle.html(`<p class="explore-images-title-p">Ceramic sculptures from your selection</p>`).style("background", colors[8]).style("color", "peru")
+    //   if (barClicked != 8 && clicked == true) {
+    //     removeElementsByClass(".displayed-images")
+    //   }
+
+    //   var currentImages = [];
+    //   for (var i=0; i<ceramic.length; i++) {
+    //     imageArray.forEach(image => {
+    //       if (ceramic[i]["Object ID"].match(image["Object ID"])) {
+    //         currentImages.push(image)
+    //       }
+    //     });
+    //   }
+
+    //   currentImages.sort(compare)
+    //   renderEachImage(currentImages)
+    //   console.log(currentImages)
+
+    //   barClicked = 8;
+    //   clicked = true;
+    // } else if (d.material == "Alabaster") {
+
+    //   element.scrollIntoView({behavior: "smooth"});
+
+    //   exploreImagesTitle.html(`<p class="explore-images-title-p">Alabaster sculptures from your selection</p>`).style("background", colors[9]).style("color", "peru")
+    //   if (barClicked != 9 && clicked == true) {
+    //     removeElementsByClass(".displayed-images")
+    //   }
+
+    //   var currentImages = [];
+    //   for (var i=0; i<alabaster.length; i++) {
+    //     imageArray.forEach(image => {
+    //       if (alabaster[i]["Object ID"].match(image["Object ID"])) {
+    //         currentImages.push(image)
+    //       }
+    //     });
+    //   }
+
+    //   currentImages.sort(compare)
+    //   renderEachImage(currentImages)
+    //   console.log(currentImages)
+
+    //   barClicked = 9;
+    //   clicked = true;
+    // } else if (d.material == "Plaster") {
+
+    //   element.scrollIntoView({behavior: "smooth"});
+
+    //   exploreImagesTitle.html(`<p class="explore-images-title-p">Plaster sculptures from your selection</p>`).style("background", colors[10]).style("color", "peru")
+    //   if (barClicked != 10 && clicked == true) {
+    //     removeElementsByClass(".displayed-images")
+    //   }
+
+    //   var currentImages = [];
+    //   for (var i=0; i<plaster.length; i++) {
+    //     imageArray.forEach(image => {
+    //       if (plaster[i]["Object ID"].match(image["Object ID"])) {
+    //         currentImages.push(image)
+    //       }
+    //     });
+    //   }
+
+    //   currentImages.sort(compare)
+    //   renderEachImage(currentImages)
+    //   console.log(currentImages)
+
+    //   barClicked = 10;
+    //   clicked=true;
+    // }
+
+    // HERE!
+
+
+  // var imageHolder = document.getElementById("explore-images")
+
+  // imageHolder.selectAll("img").addEventListener("click", testFunction)
+
+  // for (element of eachExampleImage) {
+
+  //   element.addEventListener("click", testFunction)
+  // }
+
+// function testFunction() {
+//       console.log('test for tooltip')
+//     };
+
+
+  // var testLog = console.log('test for tooltip')
+
+  // eachExampleImage.forEach(div => {
+  //   div.selectAll("img").addEventListener("click", function () {
+  //     console.log('test for tooltip')
+  //   });
+  // });
+
+
+  // eachExampleImage.selectAll("img")
     // if (d.material == "Gold") {
     //   exploreImages.append("rect").attr("height", 50).attr("width", 50).attr("x", 0).attr("y",0).attr("class", "rectangle").attr("fill", colors[i]);
     // } else if (d.material == "Wood") {
